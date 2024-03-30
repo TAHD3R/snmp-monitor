@@ -1,5 +1,6 @@
 from easysnmp import Session, SNMPVariable
 from easysnmp.exceptions import EasySNMPNoSuchNameError, EasySNMPTimeoutError
+from modules.logger import logger
 
 
 class SNMPClient:
@@ -28,18 +29,18 @@ class SNMPClient:
             result: SNMPVariable = self.session.get(oid)
             return result
         except EasySNMPNoSuchNameError:
-            print(f"{oid} not found")
+            logger.error(f"{oid} not found")
         except EasySNMPTimeoutError:
-            print(f"Timeout error")
+            logger.error(f"Timeout error")
 
     def get_multiple(self, oids: list[str]) -> list[SNMPVariable]:
         try:
             result: list[SNMPVariable] = self.session.get(oids)
             return result
         except EasySNMPNoSuchNameError:
-            print(f"{oids} not found")
+            logger.error(f"{oids} not found")
         except EasySNMPTimeoutError:
-            print(f"Timeout error")
+            logger.error(f"Timeout error")
 
     @property
     def temperature(self) -> float | None:

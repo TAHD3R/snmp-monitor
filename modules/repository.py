@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -14,7 +15,7 @@ class LogRepository:
         self.model = Log
 
     async def add(self, db: AsyncSession, log_info: LogInfo):
-        log = self.model(**log_info.model_dump())
+        log = self.model(**log_info.model_dump(), created_at=datetime.now())
 
         try:
             db.add(log)

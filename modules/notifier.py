@@ -1,4 +1,6 @@
+import asyncio
 from datetime import datetime
+import time
 import httpx
 
 from exceptions.notifier import RequestError, UserIdError
@@ -123,6 +125,7 @@ class WecomNotifier(NotifierBase):
                     notify_params=notify_params,
                     show_content=show_content,
                 )
+                await asyncio.sleep(1)
 
 
 class Report:
