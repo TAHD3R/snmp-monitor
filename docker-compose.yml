@@ -9,7 +9,20 @@ services:
     env_file: .env
     environment:
       - TZ=Asia/Beijing
-      - REDIS_HOST=host.docker.internal
-      - SQL_HOST=host.docker.internal
+      - REDIS_HOST=redis
     extra_hosts:
     - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+    networks:
+      - mynetwork
+
+  redis:
+    image: redis
+    restart: always
+    container_name: redis
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
