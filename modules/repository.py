@@ -2,32 +2,24 @@ from datetime import datetime
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from model.log import Log
-from model.user import Relative_Users
+from models.log import Log
+from models.user import Relative_Users
 from modules.logger import logger
 
-
-from schema.log import LogInfo
+from schemas.log import LogInfo
 
 
 class LogRepository:
     def __init__(self):
         self.model = Log
 
-    async def add(self, db: AsyncSession, log_info: LogInfo):
-        log = self.model(**log_info.model_dump(), created_at=datetime.now())
+    async def add(self, db: AsyncSession, record: LogInfo):
+        log = self.model(**record.model_dump(), created_at=datetime.now())
+        db.add(log)
+        await db.commit()
 
-        try:
-            db.add(log)
-            await db.commit()
-        except Exception as e:
-            await db.rollback()
-            logger.error("写入错误: ", e)
-            return
 
-        logger.info(
-            f"写入记录: {log_info.location} - 温度: {log_info.temperature}℃ - 湿度: {log_info.humidity}%"
-        )
+log_repo = LogRepository()
 
 
 class UserRepository:
@@ -41,5 +33,4 @@ class UserRepository:
         return users
 
 
-log_repo = LogRepository()
 user_repo = UserRepository()
