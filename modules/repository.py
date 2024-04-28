@@ -6,7 +6,6 @@ from model.log import Log
 from model.user import Relative_Users
 from modules.logger import logger
 
-
 from schema.log import LogInfo
 
 
@@ -17,15 +16,10 @@ class LogRepository:
     async def add(self, db: AsyncSession, record: LogInfo):
         log = self.model(**record.model_dump(), created_at=datetime.now())
         db.add(log)
+        await db.commit()
 
-        try:
-            await db.commit()
-            logger.info(
-                f"写入记录: {record.location} - 温度: {record.temperature}℃ - 湿度: {record.humidity}%"
-            )
-        except Exception as e:
-            await db.rollback()
-            logger.error("写入错误: ", e)
+
+log_repo = LogRepository()
 
 
 class UserRepository:
@@ -39,5 +33,4 @@ class UserRepository:
         return users
 
 
-log_repo = LogRepository()
 user_repo = UserRepository()

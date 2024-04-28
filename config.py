@@ -1,5 +1,5 @@
 from functools import lru_cache
-from pydantic import MySQLDsn, RedisDsn
+from pydantic import AnyUrl, MySQLDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +19,11 @@ class WecomConfig(BaseSettings):
     WECOM_CORP_SECRET: str
     WECOM_AGENT_ID: int
 
+    WECOM_ROBOT_NAME: str = "机房设备温湿度检测脚本"
+    WECOM_ROBOT_AVATAR: AnyUrl = "https://wecom.buct.edu.cn/qiyehao/huojing/robot.png"
+    WECOM_DETAIL_BUTTON: str = "查看数据详情"
+    WECOM_DETAIL_URL: AnyUrl = "https://wecom.buct.edu.cn/qiyehao/huojing/index.php"
+
     @property
     def wecom_kwargs(self):
         return {
@@ -32,14 +37,14 @@ class DatabaseConfig(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: int
     REDIS_DB: int
-    REDIS_URI: RedisDsn = "redis://${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}"
+    REDIS_URL: RedisDsn = "redis://${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}"
 
     SQL_USER: str
     SQL_PASSWORD: str
     SQL_HOST: str
     SQL_PORT: int
     SQL_DB: str
-    SQL_URI: MySQLDsn = (
+    SQL_URL: MySQLDsn = (
         "mysql+aiomysql://${SQL_USER}:${SQL_PASSWORD}@${SQL_HOST}:${SQL_PORT}/${SQL_DB}"
     )
 

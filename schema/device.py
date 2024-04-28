@@ -10,4 +10,4 @@ class DeviceInfo(GeneralModel):
 
 
 class Devices(GeneralModel):
-    sensors: List[DeviceInfo]
+    devices: List[DeviceInfo]

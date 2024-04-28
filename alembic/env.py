@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from config import config as app_config
 
 config = context.config
-config.set_main_option("sqlalchemy.url", app_config.SQL_URI.unicode_string())
+config.set_main_option("sqlalchemy.url", app_config.SQL_URL.unicode_string())
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
