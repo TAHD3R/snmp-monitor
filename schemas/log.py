@@ -1,5 +1,5 @@
 from typing import Optional
-from schema.base import GeneralModel
+from schemas.base import GeneralModel
 
 
 class LogInfo(GeneralModel):

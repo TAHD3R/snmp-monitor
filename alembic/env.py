@@ -14,8 +14,8 @@ if config.config_file_name is not None:
 
 
 from modules.database import Base
-from model.log import Log
-from model.user import Relative_Users
+from models.log import Log
+from models.user import Relative_Users
 
 target_metadata = Base.metadata
 

@@ -1,7 +1,7 @@
 import yaml
 from config import config
 from pathlib import Path
-from schema.device import Devices
+from schemas.device import Devices
 
 
 def load_devices_info() -> Devices:

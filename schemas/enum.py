@@ -1,9 +1,7 @@
 from enum import Enum
-from typing import Optional
-from schema.base import GeneralModel
 
 
-class WorkStatus(str, Enum):
+class Constants(str, Enum):
     GREETING = "温湿度检测脚本已启动"
     GOODBYE = "温湿度脚本已停止运行"
     NETWORK_ERROR = "无法获取设备数据, 请及时排查原因"
@@ -20,25 +18,3 @@ class WorkStatus(str, Enum):
 
     def __str__(self):
         return self.value
-
-
-class AccessToken(GeneralModel):
-    corpid: str
-    corpsecret: str
-    debug: int
-
-
-class DeviceStatus(GeneralModel):
-    status: WorkStatus
-    detail: Optional[str] = None
-
-
-class NotifyParams(GeneralModel):
-    title: DeviceStatus
-    ip: Optional[str] = None
-    content: Optional[str] = None
-    location: Optional[str] = None
-
-
-class UserInfo(GeneralModel):
-    userid: str

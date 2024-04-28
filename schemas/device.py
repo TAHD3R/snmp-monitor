@@ -1,5 +1,5 @@
 from typing import List
-from schema.base import GeneralModel
+from schemas.base import GeneralModel
 
 
 class DeviceInfo(GeneralModel):

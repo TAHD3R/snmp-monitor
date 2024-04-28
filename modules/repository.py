@@ -2,11 +2,11 @@ from datetime import datetime
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from model.log import Log
-from model.user import Relative_Users
+from models.log import Log
+from models.user import Relative_Users
 from modules.logger import logger
 
-from schema.log import LogInfo
+from schemas.log import LogInfo
 
 
 class LogRepository:

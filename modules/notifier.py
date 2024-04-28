@@ -5,13 +5,13 @@ import httpx
 
 from exceptions.notifier import RequestError, UserIdError
 from modules.database import get_session
-from schema.notifier import (
+from schemas.notifier import (
     AccessToken,
     NotifyParams,
     DeviceStatus,
     UserInfo,
-    WorkStatus,
 )
+from schemas.enum import Constants
 from modules.redis import redis
 from modules.logger import logger
 from config import config
@@ -174,30 +174,30 @@ class WecomNotifier(WecomBase):
 class Report:
     async def device_timeout(self, ip: str, location: str):
         device_status = DeviceStatus(
-            status=WorkStatus.SCRIPT_EXCEPTION, detail="连接超时"
+            status=Constants.SCRIPT_EXCEPTION, detail="连接超时"
         )
         params = NotifyParams(
             title=device_status,
             ip=ip,
             location=location,
-            content=WorkStatus.NETWORK_ERROR,
+            content=Constants.NETWORK_ERROR,
         )
         await self.notify_multi(params=params)
 
     async def device_recovered(self, location: str, ip: str):
         device_status = DeviceStatus(
-            status=WorkStatus.NETWORK_RECOVERED, detail="设备已恢复连接"
+            status=Constants.NETWORK_RECOVERED, detail="设备已恢复连接"
         )
         params = NotifyParams(
             title=device_status,
             ip=ip,
             location=location,
-            content=WorkStatus.NETWORK_RECOVERED,
+            content=Constants.NETWORK_RECOVERED,
         )
         await self.notify_multi(params=params)
 
     async def db_write_error(self, exception: str):
-        device_status = DeviceStatus(status=WorkStatus.WRITE_INFO_ERROR)
+        device_status = DeviceStatus(status=Constants.WRITE_INFO_ERROR)
         params = NotifyParams(
             title=device_status,
             content=f"错误详情: {exception}",
@@ -205,7 +205,7 @@ class Report:
         await self.notify_multi(params=params, show_content=False)
 
     async def greeting(self):
-        device_status = DeviceStatus(status=WorkStatus.GREETING)
+        device_status = DeviceStatus(status=Constants.GREETING)
         params = NotifyParams(
             title=device_status,
             content="祝您工作顺利，生活愉快。",
@@ -214,7 +214,7 @@ class Report:
 
     async def goodbye(self, duration: float):
         device_status = DeviceStatus(
-            status=WorkStatus.GOODBYE, detail=f"已运行{duration}"
+            status=Constants.GOODBYE, detail=f"已运行{duration}"
         )
         params = NotifyParams(
             title=device_status,

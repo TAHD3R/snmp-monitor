@@ -7,14 +7,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from easysnmp import EasySNMPTimeoutError
 
 from config import config
-from schema.log import LogInfo
-from schema.device import DeviceInfo
+from schemas.log import LogInfo
+from schemas.device import DeviceInfo
 from modules.redis import redis
 from modules.logger import logger
 from modules.easysnmp import SNMPClient
 from modules.repository import log_repo
 from modules.notifier import notifier
-from schema.notifier import NotifyParams, DeviceStatus, WorkStatus
+from schemas.notifier import NotifyParams, DeviceStatus
+from schemas.enum import Constants
 
 
 class Worker:
@@ -83,9 +84,9 @@ class Worker:
         value: float,
     ):
         current_status = (
-            WorkStatus.HUMIDITY_THRESHOLD
+            Constants.HUMIDITY_THRESHOLD
             if type == "Humidity"
-            else WorkStatus.TEMPERATURE_THRESHOLD
+            else Constants.TEMPERATURE_THRESHOLD
         )
 
         date = datetime.now().strftime("%Y-%m-%d")
