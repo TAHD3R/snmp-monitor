@@ -8,21 +8,21 @@ services:
       dockerfile: Dockerfile
     env_file: .env
     environment:
-      - TZ=Asia/Beijing
+      - TZ=Asia/Shanghai
       - REDIS_HOST=redis
     extra_hosts:
     - "host.docker.internal:host-gateway"
     depends_on:
       - redis
     networks:
-      - mynetwork
+      - snmp_monitor
 
   redis:
     image: redis
     restart: always
     container_name: redis
     networks:
-      - mynetwork
+      - snmp_monitor
 
 networks:
-  mynetwork:
+  snmp_monitor:
