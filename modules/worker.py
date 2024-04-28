@@ -1,5 +1,6 @@
 import asyncio
 import time
+from typing import Literal
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import config
@@ -14,43 +15,34 @@ from schema.notifier import Notify, NotifyStatus, WorkStatus
 
 class Worker:
     def __init__(self, device_info: DeviceInfo, db: AsyncSession):
-        super().__init__()
-
-        self.device_info = device_info
+        self.device_info = device_info.model_dump()
+        self.location = device_info.campus + device_info.building + device_info.room
         self.db = db
 
     async def run(self) -> None:
-        humidity, temperature = SNMPClient(**self.device_info.model_dump())
-        location = (
-            self.device_info.campus + self.device_info.building + self.device_info.room
+        humidity, temperature = SNMPClient(**self.device_info)
+        record = LogInfo(
+            humidity=humidity, temperature=temperature, location=self.location
         )
-        log_info = LogInfo(
-            humidity=humidity, temperature=temperature, location=location
-        )
-        await log_repo.add(log_info=log_info, db=self.db)
-        await self.check_threshold(
-            location=location, humidity=humidity, temperature=temperature
-        )
-        await asyncio.sleep(1)
+        await log_repo.add(record=record, db=self.db)
+        await self.__check_threshold(humidity=humidity, temperature=temperature)
 
-    async def check_threshold(self, location: str, humidity: float, temperature: float):
+    async def __check_threshold(self, humidity: float, temperature: float):
         if humidity > config.MONITOR_HUMIDITY_THRESHOLD:
-            await self.notify_threshold_exceeded(
-                location, WorkStatus.HUMIDITY_THRESHOLD, humidity
-            )
-
+            await self.__notify_threshold(type="Humidity", value=humidity)
         if temperature > config.MONITOR_TEMPREATURE_THRESHOLD:
-            await self.notify_threshold_exceeded(
-                location, WorkStatus.TEMPERATURE_THRESHOLD, temperature
-            )
+            await self.__notify_threshold(type="Temperature", value=temperature)
 
-    async def notify_threshold_exceeded(
-        self, location: str, threshold_type: WorkStatus, value: float
+    async def __notify_threshold(
+        self,
+        *,
+        type: Literal["Humidity", "Temperature"],
+        value: float,
     ):
-        status = NotifyStatus(
-            status=threshold_type,
-            detail=str(WorkStatus.ATTENTION_NEEDED),
+        current_status = (
+            WorkStatus.HUMIDITY_THRESHOLD
+            if type == "Humidity"
+            else WorkStatus.TEMPERATURE_THRESHOLD
         )
-        notify_params = Notify(status=status, **self.device_info.model_dump())
-        await notifier.notify_multi(notify_params=notify_params)
-        logger.warning(f"{location}达到阈值: {threshold_type}")
+        current_value = f"{value}%" if type == "Humidity" else f"{value}℃"
+        logger.warning(f"{current_status}: {self.location} - {current_value}")

@@ -14,20 +14,18 @@ class LogRepository:
     def __init__(self):
         self.model = Log
 
-    async def add(self, db: AsyncSession, log_info: LogInfo):
-        log = self.model(**log_info.model_dump(), created_at=datetime.now())
+    async def add(self, db: AsyncSession, record: LogInfo):
+        log = self.model(**record.model_dump(), created_at=datetime.now())
+        db.add(log)
 
         try:
-            db.add(log)
             await db.commit()
+            logger.info(
+                f"写入记录: {record.location} - 温度: {record.temperature}℃ - 湿度: {record.humidity}%"
+            )
         except Exception as e:
             await db.rollback()
             logger.error("写入错误: ", e)
-            return
-
-        logger.info(
-            f"写入记录: {log_info.location} - 温度: {log_info.temperature}℃ - 湿度: {log_info.humidity}%"
-        )
 
 
 class UserRepository:

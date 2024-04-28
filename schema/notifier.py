@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 from schema.base import GeneralModel
 
 
@@ -32,10 +33,8 @@ class NotifyStatus(GeneralModel):
 
 class Notify(GeneralModel):
     status: NotifyStatus
-    ip: str | None = None
-    campus: str | None = None
-    building: str | None = None
-    room: str | None = None
+    ip: Optional[str] = None
+    location: Optional[str] = None
 
 
 class UserInfo(GeneralModel):

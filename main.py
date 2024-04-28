@@ -12,7 +12,7 @@ async def main():
     while True:
         workers: list[Worker] = []
 
-        for device in load_devices_info().sensors:
+        for device in load_devices_info().devices:
             async for session in get_session():
                 workers.append(Worker(device_info=device, db=session))
 
