@@ -19,7 +19,6 @@ class Logger:
             "encoding": "utf-8",
             "enqueue": True,
             "retention": "7 days",
-            "rotation": "00:00",
             "compression": "zip",
         }
 
