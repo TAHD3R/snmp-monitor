@@ -1,6 +1,5 @@
 import asyncio
 import time
-import atexit
 
 
 from config import config
@@ -38,7 +37,7 @@ async def main():
 async def onexit():
     end_time = time.time()
     duration = end_time - start_time
-    await notifier.goodbye(duration=format_duration(duration))
+    await notifier.goodbye(duration=format_duration(int(duration)))
     logger.info("机房温湿度检测脚本关闭")
 
 

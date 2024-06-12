@@ -174,7 +174,7 @@ class WecomNotifier(WecomBase):
 class Report:
     async def device_timeout(self, ip: str, location: str):
         device_status = DeviceStatus(
-            status=Constants.SCRIPT_EXCEPTION, detail="连接超时"
+            status=Constants.SCRIPT_EXCEPTION, detail="持续连接超时"
         )
         params = NotifyParams(
             title=device_status,

@@ -23,6 +23,9 @@ class Worker:
         self.device_info = device_info.model_dump()
         self.location = device_info.campus + device_info.building + device_info.room
         self.db = db
+        self.redis = redis
+        self.notifier = notifier
+        self.log_repo = log_repo
 
     async def run(self) -> None:
         try:
@@ -37,36 +40,45 @@ class Worker:
             date = datetime.now().strftime("%Y-%m-%d")
             key = f"snmp_monitor:{self.device_info['ip']}:{date}:timeout"
             count = await redis.get(key)
-            if count is None:
-                await redis.set(key, value=1, expire=86400)
-            elif int(count) < 3:
-                await redis.incr(key)
-            else:
-                return
 
-            await notifier.device_timeout(
-                location=self.location,
-                ip=self.device_info["ip"],
-            )
+            if count is None:
+                await self.redis.set(key, value=1, expire=86400)
+            else:
+                count = int(count) + 1
+                await self.redis.set(key, value=count, expire=86400)
+                if count < 3:
+                    return
+
+            if count == 3:
+                await self.notifier.device_timeout(
+                    location=self.location,
+                    ip=self.device_info["ip"],
+                )
             return
 
         try:
-            await log_repo.add(record=record, db=self.db)
+            # Try to add the record to the database
+            await self.log_repo.add(record=record, db=self.db)
         except Exception as e:
+            # Handle database write error
             logger.error(f"{self.location} - 记录写入失败, {e}")
 
             date = datetime.now().strftime("%Y-%m-%d")
             key = f"snmp_monitor:{self.device_info['ip']}:{date}:write_error"
-            count = await redis.get(key)
+            count = await self.redis.get(key)
+
             if count is None:
-                await redis.set(key, value=1, expire=86400)
-            elif int(count) < 3:
-                await redis.incr(key)
+                await self.redis.set(key, value=1, expire=86400)
             else:
-                return
+                count = int(count) + 1
+                await self.redis.set(key, value=count, expire=86400)
+                if count < 3:
+                    return
 
-            await notifier.db_write_error(exception=str(e))
+            if count == 3:
+                await self.notifier.db_write_error(exception=str(e))
 
+        # Check thresholds for the retrieved data
         await self.__check_threshold(humidity=humidity, temperature=temperature)
 
     async def close(self):
